@@ -4,8 +4,8 @@
 # In[8]:
 
 
-# Physics Thesis Code for Calculating fusion rate 
-# Author: Jacob van de Lindt 
+# Physics Thesis Code for Calculating fusion rate
+# Author: Jacob van de Lindt
 # July 17th, 2019
 
 import matplotlib.pyplot as plt
@@ -27,7 +27,7 @@ R_alloy = .01
 R_steel = .01
 R_stalk = .06
 
-# Specify Physical constants 
+# Specify Physical constants
 
 mu_o = 1
 epsi_o = 1
@@ -100,11 +100,11 @@ def P_fus_scalar_field(x, y, z):
 # In[257]:
 
 
-# Define randome initialization function 
+# Define randome initialization function
 def random_ion_initializer():
     return x, y, z
 
-# Define the ion cloud density initial guess. Assume that it is a half sine wave initially. 
+# Define the ion cloud density initial guess. Assume that it is a half sine wave initially.
 def density_distrobution_initializer(x, period, Amplitude):
     return Amplitude*np.cos((np.pi/2*x) / period) * e
 
@@ -114,30 +114,30 @@ plt.plot(rx_vec, density_distrobution_initializer(rx_vec, np.max(rx_vec), 10))
 # In[258]:
 
 
-# Initialize the dimension vector of the Machine: 
+# Initialize the dimension vector of the Machine:
 r_res = .005
 dr = r_res
 rx_vec = np.arange(0, R_anode, r_res)
-    
+
 dt = dr*2
 time_steps = 100
 
 #initialize the time vector
-t_vec = np.arange(0, time_steps*dt, dt) 
+t_vec = np.arange(0, time_steps*dt, dt)
 
 #Initialize the particle position vector with zeros up to the end of the time steps
-prx_vec = np.zeros(t_vec.shape[0])  
+prx_vec = np.zeros(t_vec.shape[0])
 
 #Initialize the particle velocity vector with zeros up to the end of the time steps
-pveloc_vec = np.zeros(t_vec.shape[0]) 
+pveloc_vec = np.zeros(t_vec.shape[0])
 
-# Initialize the potential vector with zeros 
+# Initialize the potential vector with zeros
 Psi_vec_beta = np.zeros(rx_vec.shape[0])
 
 # Initialize the E-field vector with zeros
 
 E_vec = np.zeros(rx_vec.shape[0])
-# Begin calculating the potential and Electric field 
+# Begin calculating the potential and Electric field
 Amplitude = 10000
 density_vec = density_distrobution_initializer(rx_vec, rx_vec.shape[0], Amplitude)
 
@@ -146,7 +146,7 @@ Psi_anode = 0
 #tunable second initial condition
 Psi_anode_second = 0
 #target second initial condition
-Psi_cathode = 100 #V 
+Psi_cathode = 100 #V
 
 
 
@@ -162,12 +162,12 @@ def make_Psi_forward(Psi_init, rho_vec):
 
     for m in range(2, rx_vec.shape[0]):
         r_mm = np.abs(rx_vec[m-1])
-        top_first = (2*dr + 2*r_mm) * Psi[m-1] 
+        top_first = (2*dr + 2*r_mm) * Psi[m-1]
         top_second = r_mm * Psi[m-2]
         top_third = ( r_mm * rho_vec[m-1] * dr**2 ) / epsi_o
         bottom = 2 * dr + r_mm
-        Psi[m] = ( top_first - top_second - top_third ) / ( bottom ) 
-    
+        Psi[m] = ( top_first - top_second - top_third ) / ( bottom )
+
     return Psi
 Psi_forward = make_Psi_forward(Psi_vec_beta, density_vec)
 plt.plot(rx_vec, Psi_forward)
@@ -176,41 +176,41 @@ plt.plot(rx_vec, Psi_forward)
 # In[261]:
 
 
-# finite difference matrix implimentation 
+# finite difference matrix implimentation
 
 def make_Psi_global(position_vec, rho_vec, V_grid, cathod_pos_from_left):
     n = position_vec.shape[0]
     node_matrix = np.zeros((n, n))
-    
+
     m_cathode = round(cathod_pos_from_left / dr)
-    # Add Dirchele boundery conditions 
+    # Add Dirchele boundery conditions
     node_matrix[0, n-1] = 1
     node_matrix[1, m_cathode] = 1
-    
+
     for ii in range(2, n):
         m = ii - 1
         r_m = np.abs(position_vec[m])
         node_matrix[ii, ii - 2] = r_m
         node_matrix[ii, ii - 1] = -( 2*dr + 2*r_m  )
         node_matrix[ii, ii] = 2*dr + r_m
-         
+
     # now create the b vector in the expression Ax = b
-    
+
     b_vec = np.zeros((n, 1))
-    
+
     for jj in range(2, n):
         m = ii - 1
         r_m = np.abs(position_vec[m])
         b_vec[jj] = - (r_m*rho_vec[m]*dr**2) / epsi_o
     b_vec[0] = 0
     b_vec[1] = V_grid
-    
+
     mat_inverse = np.linalg.inv(node_matrix)
     return np.matmul(mat_inverse, b_vec)
-    
 
-    
-    
+
+
+
 Psi_no_density = make_Psi_global(rx_vec, density_vec, V_grid, 1)
 
 
@@ -236,22 +236,4 @@ plt.plot(rx_vec, check_behavior(rx_vec), 'r')
 #create the E-field from the potential
 def make_E_field(Psi):
     n = Psi.shape[0]
-    # Warning not yet ready 
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-
+    # Warning not yet ready
